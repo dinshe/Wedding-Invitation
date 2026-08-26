@@ -742,9 +742,6 @@
       <div id="envelopeCard" class="envelope-card-container">
         <div class="invitation-stationery-card">
           <div class="card-border-line"></div>
-          <div style="width:34px; height:34px; border-radius:50%; border:1px solid #F5BCCB; background:#FFF0F4; display:flex; align-items:center; justify-content:center; margin-bottom:0.3rem;">
-            <span style="font-family:var(--font-cinzel); font-size:0.7rem; font-weight:700; color:#892640;">M &amp; Y</span>
-          </div>
           <p id="cardPersonalizedPeek" style="font-family:var(--font-cinzel); font-size:0.65rem; letter-spacing:2px; color:var(--color-rose-700); font-weight:600; text-transform:uppercase; margin-bottom:0.1rem;">
             Dear Honoured Guest
           </p>
@@ -830,7 +827,6 @@
   <nav class="navbar" id="navbar">
     <a href="#home" class="nav-logo">
       <span style="font-family:var(--font-cinzel); font-size:0.8rem; font-weight:700; border:1px solid #F5BCCB; background:#FFF0F4; color:#892640; width:32px; height:32px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">M&amp;Y</span>
-      <span style="font-weight:500;">Mayurika &amp; Yashodha</span>
     </a>
     <ul class="nav-links">
       <li><a href="#home">Home</a></li>
@@ -841,9 +837,6 @@
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#rsvp" style="color:var(--color-rose-600); font-weight:700;">RSVP</a></li>
     </ul>
-    <button id="replayEnvelopeNavBtn" class="btn-luxury-secondary" style="padding:0.4rem 1rem; font-size:0.7rem;">
-      ✉️ Envelope
-    </button>
   </nav>
 
   <!-- ============================================================
@@ -1352,7 +1345,6 @@
     const cardTapPrompt = document.getElementById('cardTapPrompt');
     const waxSealBtn = document.getElementById('waxSealBtn');
     const quickOpenBtn = document.getElementById('quickOpenBtn');
-    const replayEnvelopeNavBtn = document.getElementById('replayEnvelopeNavBtn');
 
     let isFlapOpen = false;
     let isCardEmerged = false;
@@ -1422,20 +1414,6 @@
       else handleCardClick();
     });
 
-    // Replay envelope button
-    replayEnvelopeNavBtn.addEventListener('click', () => {
-      isFlapOpen = false;
-      isCardEmerged = false;
-      isZooming = false;
-      isEnvelopeDismissed = false;
-      envelopeWrapper.classList.remove('scene-dismissed');
-      envelopeTopFlap.classList.remove('flap-opened');
-      envelopeCard.classList.remove('card-emerged', 'card-zooming');
-      cardTapPrompt.style.display = 'none';
-      waxSealBtn.classList.remove('seal-broken');
-      quickOpenBtn.innerText = 'Open Invitation';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
 
     // 3. Background Audio & Web Audio API Ambient Synth Fallback
     const bgAudio = document.getElementById('bgAudio');
