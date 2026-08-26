@@ -34,13 +34,6 @@ export const InvitationCard3D: React.FC<InvitationCard3DProps> = ({
       <div className="invitation-stationery-card">
         <div className="card-border-line" />
 
-        {/* Monogram Seal Badge */}
-        <div className="w-8 h-8 rounded-full border border-[#F5BCCB] flex items-center justify-center mb-1.5 bg-[#FFF0F4]">
-          <span className="font-cinzel text-[0.65rem] font-semibold text-[#892640]">
-            {weddingConfig.couple.monogram}
-          </span>
-        </div>
-
         {/* Personalized Salutation */}
         <p className="font-cinzel text-[0.65rem] tracking-[2px] text-[#A82E4E] font-semibold uppercase mb-0.5">
           {invitee.isPersonalized ? `Dear ${invitee.name}` : 'Formal Invitation'}
