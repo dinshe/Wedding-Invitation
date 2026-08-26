@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -24,20 +24,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: './wedding-invitation/package.json'
-
-      - name: Install dependencies
-        working-directory: ./wedding-invitation
-        run: npm ci || npm install
-
-      - name: Build production bundle
-        working-directory: ./wedding-invitation
-        run: npm run build
+      - name: Rename standalone.html to index.html for GitHub Pages
+        run: |
+          cp standalone.html _site_index.html
+          mkdir -p _site
+          cp standalone.html _site/index.html
+          # Copy any other assets if they exist
+          if [ -d "public" ]; then
+            cp -r public/. _site/
+          fi
+          if [ -d "assets" ]; then
+            cp -r assets/. _site/assets/
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -45,7 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './wedding-invitation/dist'
+          path: './_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
