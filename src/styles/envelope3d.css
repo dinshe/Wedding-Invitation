@@ -1,0 +1,323 @@
+/* ============================================================
+   85% ROSE THEME — REALISTIC 3D WEDDING ENVELOPE
+   ============================================================ */
+
+.envelope-scene-wrapper {
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(circle at 50% 35%, #FFFFFF 0%, #FFF0F4 40%, #FCE0E8 75%, #F7C6D3 100%);
+  overflow: hidden;
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.9s ease;
+}
+
+.envelope-scene-wrapper.scene-dismissed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Ambient Rose Glow */
+.rose-ambient-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 141, 170, 0.25) 0%, rgba(254, 235, 240, 0.1) 60%, transparent 80%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* 3D Envelope Stage */
+.envelope-3d-stage {
+  transform-style: preserve-3d;
+  position: relative;
+  width: 330px;
+  height: 225px;
+  margin: 0 auto;
+  transition: transform 0.15s ease-out;
+}
+
+@media (min-width: 640px) {
+  .envelope-3d-stage {
+    width: 440px;
+    height: 290px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .envelope-3d-stage {
+    width: 480px;
+    height: 315px;
+  }
+}
+
+/* Base Shadow beneath the envelope */
+.envelope-base-shadow {
+  position: absolute;
+  width: 92%;
+  height: 38px;
+  left: 4%;
+  bottom: -32px;
+  background: radial-gradient(ellipse at center, rgba(137, 38, 64, 0.35) 0%, rgba(137, 38, 64, 0.08) 60%, transparent 80%);
+  filter: blur(12px);
+  border-radius: 50%;
+  transform: translateZ(-60px);
+  transition: all 0.7s ease;
+}
+
+/* Layer 1: Back Panel */
+.envelope-back-panel {
+  position: absolute;
+  inset: 0;
+  background: #FCE6EC;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(120, 46, 62, 0.16), inset 0 0 30px rgba(235, 178, 193, 0.4);
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Layer 2: Inner Lining with Rose Floral Watermark */
+.envelope-inner-lining {
+  position: absolute;
+  inset: 8px;
+  border-radius: 8px;
+  background: #FFF5F7;
+  background-image: radial-gradient(#F5BCCB 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
+  box-shadow: inset 0 0 25px rgba(229, 98, 133, 0.2);
+  z-index: 2;
+}
+
+/* Layer 3: Physical Stationery Card (Inside the pocket) */
+.envelope-card-container {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  height: 92%;
+  z-index: 3;
+  transform-style: preserve-3d;
+  transform: translateY(0) translateZ(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 1s cubic-bezier(0.2, 0.85, 0.3, 1), opacity 0.6s ease, box-shadow 1s ease;
+  cursor: default;
+}
+
+.envelope-card-container.card-emerged {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-58%) translateZ(45px) rotateX(-4deg);
+  cursor: pointer;
+}
+
+.envelope-card-container.card-zooming {
+  transform: translateY(-40%) translateZ(320px) scale(1.3);
+  opacity: 0;
+  transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.invitation-stationery-card {
+  width: 100%;
+  height: 100%;
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 4px 15px rgba(137, 38, 64, 0.12), inset 0 0 0 1px #FCE2E9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.envelope-card-container.card-emerged .invitation-stationery-card {
+  box-shadow: 
+    0 25px 50px rgba(120, 46, 62, 0.24),
+    0 8px 16px rgba(120, 46, 62, 0.15),
+    inset 0 0 0 1.5px #F5BCCB;
+}
+
+.envelope-card-container.card-emerged:hover .invitation-stationery-card {
+  box-shadow: 
+    0 30px 60px rgba(120, 46, 62, 0.35),
+    0 10px 20px rgba(120, 46, 62, 0.2),
+    inset 0 0 0 2px var(--color-rose-600);
+}
+
+.card-border-line {
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(242, 141, 170, 0.6);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Layer 4: Front Pocket Concealing the Bottom and Body of Card */
+.envelope-front-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pocket-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Layer 5: Top Flap (Hinged at top crease) */
+.envelope-top-flap-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  z-index: 5;
+  transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 6px 14px rgba(120, 46, 62, 0.2));
+}
+
+.envelope-top-flap-wrapper.flap-opened {
+  transform: rotateX(-180deg);
+  z-index: 2;
+  filter: drop-shadow(0 -8px 16px rgba(120, 46, 62, 0.1));
+}
+
+.flap-face-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.flap-face-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg) rotateZ(180deg);
+  backface-visibility: hidden;
+}
+
+/* Layer 6: Wax Seal Button centered on flap closure */
+.wax-seal-wrapper {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(12px);
+  z-index: 10;
+  cursor: pointer;
+  outline: none;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.wax-seal-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #FEEBF0 25%, #F5BCCB 60%, #B84763 100%);
+  box-shadow: 
+    0 6px 20px rgba(120, 46, 62, 0.38),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px #FFFFFF,
+    inset 0 -3px 6px rgba(137, 38, 64, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wax-seal-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 28px rgba(120, 46, 62, 0.45), 0 3px 8px rgba(0, 0, 0, 0.25), inset 0 2px 5px #FFFFFF;
+}
+
+.wax-seal-btn:active {
+  transform: scale(0.94);
+}
+
+.wax-seal-wrapper.seal-broken {
+  animation: sealBreakEffect 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes sealBreakEffect {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  40% { transform: translate(-50%, -50%) scale(1.18) rotate(6deg); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.3) rotate(-12deg); opacity: 0; }
+}
+
+.seal-monogram-text {
+  font-family: var(--font-cinzel);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #782E3E;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9), -1px -1px 1px rgba(120, 46, 62, 0.35);
+}
+
+.seal-prompt-badge {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  padding: 0.45rem 1.2rem;
+  border-radius: 9999px;
+  font-family: var(--font-cinzel);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-rose-800);
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(184, 93, 115, 0.2);
+  border: 1px solid #F5BCCB;
+  animation: promptPulseGlow 2.4s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes promptPulseGlow {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.92; }
+  50% { transform: translateX(-50%) translateY(-4px); opacity: 1; border-color: var(--color-rose-600); }
+}
+
+.card-tap-prompt {
+  margin-top: 0.6rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #B84763 0%, #892640 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-family: var(--font-cinzel);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(137, 38, 64, 0.3);
+  animation: cardPromptPulse 2s infinite ease-in-out;
+}
+
+@keyframes cardPromptPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}

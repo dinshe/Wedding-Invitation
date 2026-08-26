@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Montserrat:wght@200;300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
+/* ============================================================
+   85% LIGHT PINK / ROMANTIC ROSE WEDDING DESIGN SYSTEM
+   ============================================================ */
+:root {
+  /* 85% Rose / Pink Palette */
+  --color-rose-50: #FFF5F7;
+  --color-rose-100: #FEEBF0;
+  --color-rose-200: #FCD8E3;
+  --color-rose-300: #F9B8CB;
+  --color-rose-400: #F28DAA;
+  --color-rose-500: #E56285;
+  --color-rose-600: #C93E64;
+  --color-rose-700: #A82E4E;
+  --color-rose-800: #892640;
+  --color-rose-900: #5C1A2B;
+
+  /* Refined Luxury Blush & Champagne Accents */
+  --color-blush-soft: #FCF4F6;
+  --color-blush-card: #FFFFFF;
+  --color-blush-border: #F3CAD5;
+  --color-blush-border-hover: #E5A3B4;
+  
+  --color-rose-gold: #B85D73;
+  --color-rose-gold-dark: #782E3E;
+  --color-rose-gold-grad: linear-gradient(135deg, #D47A90 0%, #A8415C 50%, #782E3E 100%);
+  --color-rose-foil-grad: linear-gradient(135deg, #FFF0F4 0%, #F8C3D1 30%, #C96680 70%, #892640 100%);
+  
+  --color-text-title: #421824;
+  --color-text-body: #613944;
+  --color-text-muted: #9E737F;
+  --color-text-light: #7A4B56;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-cinzel: 'Cinzel', serif;
+  --font-script: 'Alex Brush', cursive;
+  --font-sans: 'Plus Jakarta Sans', 'Montserrat', -apple-system, sans-serif;
+
+  --shadow-rose-subtle: 0 10px 30px -10px rgba(184, 93, 115, 0.12);
+  --shadow-rose-luxury: 0 20px 45px -15px rgba(168, 46, 78, 0.18), 0 0 1px rgba(184, 93, 115, 0.15);
+  --shadow-rose-deep: 0 30px 60px -20px rgba(120, 46, 62, 0.28);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  background-color: var(--color-rose-50);
+  color: var(--color-text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow-x: hidden;
+  background: radial-gradient(circle at 50% 0%, #FFFFFF 0%, #FFF0F4 35%, #FDE3EB 70%, #F9D0DC 100%);
+  min-height: 100vh;
+}
+
+/* Rose Paper Texture Background */
+.paper-texture {
+  background-color: #FFF2F5;
+  background-image: 
+    radial-gradient(#F5CCD7 0.8px, transparent 0.8px), 
+    radial-gradient(#FBE4EB 0.8px, #FFF2F5 0.8px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+}
+
+/* Typography Utility Classes */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-cinzel {
+  font-family: var(--font-cinzel);
+}
+
+.font-script {
+  font-family: var(--font-script);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Metallic Rose Gold Foil Text */
+.rose-foil-text {
+  background: linear-gradient(135deg, #782E3E 0%, #B85D73 30%, #E57E97 50%, #A83856 75%, #5C1A2B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* Rose Stationery Card */
+.stationery-card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  box-shadow: 
+    0 4px 20px rgba(184, 93, 115, 0.08),
+    0 15px 35px -10px rgba(120, 46, 62, 0.12),
+    inset 0 0 0 1px #FCE2E9;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.stationery-card:hover {
+  box-shadow: 
+    0 8px 30px rgba(184, 93, 115, 0.14),
+    0 20px 45px -10px rgba(120, 46, 62, 0.18),
+    inset 0 0 0 1px #F3CAD5;
+}
+
+/* Rose Botanical Dividers */
+.botanical-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 1.6rem auto 2.5rem;
+}
+
+.botanical-divider::before,
+.botanical-divider::after {
+  content: '';
+  height: 1px;
+  width: 70px;
+  background: linear-gradient(90deg, transparent, #E5A3B4, transparent);
+}
+
+.botanical-divider span {
+  color: var(--color-rose-gold);
+  font-size: 0.9rem;
+}
+
+/* Rose Luxury Buttons */
+.btn-luxury-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #B84763 0%, #892640 100%);
+  color: #FFFFFF;
+  font-family: var(--font-cinzel);
+  font-size: 0.82rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.95rem 2.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(137, 38, 64, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-luxury-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #C95572 0%, #9D2E4A 100%);
+  box-shadow: 0 16px 32px -5px rgba(137, 38, 64, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  color: #FFFFFF;
+}
+
+.btn-luxury-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-luxury-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: #FFFFFF;
+  color: var(--color-rose-800);
+  font-family: var(--font-cinzel);
+  font-size: 0.82rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.9rem 2.2rem;
+  border-radius: 9999px;
+  border: 1.5px solid #F0B8C7;
+  box-shadow: 0 6px 18px rgba(184, 93, 115, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-luxury-secondary:hover {
+  background: #FFF5F7;
+  border-color: var(--color-rose-gold);
+  color: var(--color-rose-900);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(184, 93, 115, 0.16);
+}
+
+/* Floating Rose Petals Animation */
+.floating-petal {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-size: 1.2rem;
+  opacity: 0.45;
+  animation: floatPetal 12s linear infinite;
+}
+
+@keyframes floatPetal {
+  0% {
+    transform: translateY(105vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(60px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
