@@ -137,7 +137,7 @@ export const weddingConfig: WeddingConfig = {
 
   api: {
     // Configurable Google Apps Script Web App URL
-    appsScriptUrl: "https://script.google.com/macros/s/AKfycbx_SAMPLE_DEPLOYMENT_ID/exec",
+    appsScriptUrl: "https://script.google.com/macros/s/AKfycbwm9bNxJViMocDkoJgp5aNeysf8O6U-TomFnx-FvxUxM13DSISLRYmKU5sGYEApGGZLsg/exec",
   },
 
   audio: {
