@@ -137,7 +137,7 @@ export const weddingConfig: WeddingConfig = {
 
   api: {
     // Configured with Yashodha & Mayurika's live Google Apps Script Web App URL
-    appsScriptUrl: "https://script.google.com/macros/s/AKfycbwm9bNxJViMocDkoJgp5aNeysf8O6U-TomFnx-FvxUxM13DSISLRYmKU5sGYEApGGZLsg/exec",
+    appsScriptUrl: "https://script.google.com/macros/s/AKfycbzucBx96t7pAoe5E95bf8UR6kGqEbaxdoEdbYU-C4pP5tEgbmJrzx24ixm3XCSe9iCiXw/exec",
   },
 
   audio: {
