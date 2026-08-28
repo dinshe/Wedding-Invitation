@@ -753,9 +753,11 @@
           currentFilter === 'declining' ? (att === 'declining' || att === 'decline') :
           currentFilter === 'wishes' ? (r.message && r.message.trim().length > 0) : true;
 
+        // Convert phone to string for safe search — Google Sheets returns numbers
+        const phoneStr = String(r.phone || '');
         const matchesSearch = !search ? true :
           (r.name && r.name.toLowerCase().includes(search)) ||
-          (r.phone && r.phone.includes(search)) ||
+          (phoneStr.includes(search)) ||
           (r.message && r.message.toLowerCase().includes(search));
 
         return matchesFilter && matchesSearch;
@@ -777,16 +779,21 @@
           ? `<span class="badge-attending">💍 Attending</span>`
           : `<span class="badge-declining">🕊️ Declining</span>`;
 
-        const phoneDisplay = r.phone
+        // CRITICAL FIX: Google Sheets returns phone as a number — must cast to string before .replace()
+        const phoneStr = String(r.phone || '').trim();
+        const phoneDisplay = phoneStr && phoneStr !== '0'
           ? `<div>
-              <a href="tel:${r.phone}" style="color:var(--rose-700); text-decoration:none; font-weight:600;">📞 ${r.phone}</a>
-              <a href="https://wa.me/94${r.phone.replace(/[^0-9]/g, '').replace(/^0/, '')}" target="_blank" style="display:block; font-size:0.75rem; color:#047857; text-decoration:none; margin-top:2px;">💬 WhatsApp</a>
+              <a href="tel:${phoneStr}" style="color:var(--rose-700); text-decoration:none; font-weight:600;">📞 ${phoneStr}</a>
+              <a href="https://wa.me/94${phoneStr.replace(/[^0-9]/g, '').replace(/^0/, '')}" target="_blank" style="display:block; font-size:0.75rem; color:#047857; text-decoration:none; margin-top:2px;">💬 WhatsApp</a>
             </div>`
           : `<span style="color:var(--text-muted); font-size:0.8rem;">—</span>`;
 
         const countDisplay = isAttending
           ? `<strong>${r.guestCount || 1}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${(r.guestCount || 1) > 1 ? 'Guests' : 'Guest'}</span>${r.guestNames ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">(${r.guestNames})</div>` : ''}`
           : `<span style="color:var(--text-muted);">0</span>`;
+
+        // Cast submittedAt to string safely — Google Sheets can return a Date object
+        const submittedAt = r.submittedAt ? String(r.submittedAt) : '—';
 
         return `
           <tr>
@@ -795,7 +802,7 @@
             <td>${countDisplay}</td>
             <td>${phoneDisplay}</td>
             <td style="max-width:320px; font-style:italic; color:var(--text-dark);">${r.message ? `“${r.message}”` : `<span style="color:var(--text-muted); font-style:normal;">—</span>`}</td>
-            <td style="font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">${r.submittedAt || '—'}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">${submittedAt}</td>
           </tr>
         `;
       }).join('');

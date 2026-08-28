@@ -282,10 +282,11 @@ function handleSubmitRsvp(data) {
     attendance,
     guestCount,
     data.guestNames || '',
-    data.phone || '',
+    String(data.phone || ''), // Always store as string to prevent Google Sheets auto-converting to number
     data.message || '',
     timestamp
   ]);
+
 
   // If a message/wish is included, also mirror to WISHES tab
   if (data.message && String(data.message).trim().length > 0) {
@@ -346,10 +347,11 @@ function handleGetAdminData(pin) {
         attendance: attendance,
         guestCount: count,
         guestNames: r[4],
-        phone: r[5],
+        phone: String(r[5] || ''), // Cast to string — Google Sheets stores numbers without leading zero format
         message: message,
-        submittedAt: r[7]
+        submittedAt: r[7] ? String(r[7]) : ''
       });
+
     });
   }
 
