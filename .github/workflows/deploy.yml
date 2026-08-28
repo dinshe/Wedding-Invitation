@@ -24,11 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Rename standalone.html to index.html for GitHub Pages
+      - name: Prepare site files for GitHub Pages
         run: |
-          cp standalone.html _site_index.html
           mkdir -p _site
           cp standalone.html _site/index.html
+          if [ -f "admin.html" ]; then
+            cp admin.html _site/admin.html
+          fi
           # Copy any other assets if they exist
           if [ -d "public" ]; then
             cp -r public/. _site/

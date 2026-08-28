@@ -34,24 +34,24 @@ export const InvitationCard3D: React.FC<InvitationCard3DProps> = ({
       <div className="invitation-stationery-card">
         <div className="card-border-line" />
 
-        {/* Personalized Salutation */}
-        <p className="font-cinzel text-[0.65rem] tracking-[2px] text-[#A82E4E] font-semibold uppercase mb-0.5">
-          {invitee.isPersonalized ? `Dear ${invitee.name}` : 'Formal Invitation'}
+        {/* 1. Personalized Salutation / Guest Name at the top */}
+        <p className="font-cinzel text-[0.65rem] tracking-[2px] text-[#A82E4E] font-semibold uppercase mb-1">
+          {invitee.isPersonalized ? `Dear ${invitee.name}` : 'Dear Honoured Guest'}
         </p>
 
-        {/* Couple Names */}
-        <h2 className="font-serif text-2xl sm:text-3xl text-[#421824] tracking-wide my-0.5 leading-tight">
-          {weddingConfig.couple.bride}
-          <span className="font-script text-xl text-[#B84763] mx-1">&</span>
-          {weddingConfig.couple.groom}
-        </h2>
-
-        {/* Event */}
-        <p className="font-cinzel text-[0.55rem] tracking-[2.5px] text-[#9E737F] uppercase mt-0.5">
+        {/* 2. The Celebration of Marriage */}
+        <p className="font-cinzel text-[0.55rem] tracking-[2.5px] text-[#9E737F] uppercase mb-1">
           The Celebration of Marriage
         </p>
 
-        {/* Date & Venue */}
+        {/* 3. Couple Names with elegant serif italic ampersand */}
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#421824] tracking-wide my-0.5 leading-tight">
+          {weddingConfig.couple.bride}
+          <span className="font-serif italic font-normal text-2xl text-[#C93E64] mx-1">&amp;</span>
+          {weddingConfig.couple.groom}
+        </h2>
+
+        {/* 4. Date & Venue */}
         <div className="mt-2 pt-1.5 border-t border-[#FCD8E3] w-full max-w-[200px]">
           <p className="font-serif text-xs text-[#613944] font-medium">
             {weddingConfig.date.fullDisplay}

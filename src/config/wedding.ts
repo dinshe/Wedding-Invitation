@@ -16,7 +16,9 @@ export const weddingConfig: WeddingConfig = {
       "(Late) Mr. Mahinda Salgado"
     ],
     bride: [
-      "Mr. & Mrs. Liyana Wanniarachchi"
+      "Mrs. Krishanthi Amarasena",
+      "and",
+      "Mr. Jayantha Liyana Wanniarachchi"
     ]
   },
 
@@ -50,7 +52,7 @@ export const weddingConfig: WeddingConfig = {
     },
   },
 
-  invitationMessage: "WITH JOYOUS HEARTS, WE INVITE YOU TO CELEBRATE OUR LOVE STORY! JOIN US AS WE TIE THE KNOT.",
+  invitationMessage: "“Two hearts, one beautiful promise, and a lifetime of love ahead…”\n\nWe would be delighted to have you with us as we celebrate the beginning of our forever.\n\nWith love, we look forward to celebrating with you!",
 
   rsvpContacts: [
     {

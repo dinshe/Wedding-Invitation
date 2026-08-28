@@ -15,7 +15,7 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [submittedAttendance, setSubmittedAttendance] = useState<'attending' | 'declining'>('attending');
 
   const maxGuests = invitee.allowedGuests || 1;
 
@@ -32,10 +32,10 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
       message,
     };
 
-    const res = await submitRsvpApi(payload);
+    setSubmittedAttendance(attendance);
+    await submitRsvpApi(payload);
     setIsSubmitting(false);
     setIsSubmitted(true);
-    setFeedbackMessage(res.message);
   };
 
   return (
@@ -59,23 +59,33 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
         <div className="stationery-card p-8 sm:p-12 relative border border-[#F5BCCB]">
           {isSubmitted ? (
             <div className="text-center py-8">
-              {/* Luxury Success Checkmark */}
+              {/* Conditional Success Icon */}
               <div className="w-16 h-16 rounded-full bg-[#FFF0F4] border border-[#FCD8E3] text-[#C93E64] flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
-                ✓
+                {submittedAttendance === 'attending' ? '💍' : '🕊️'}
               </div>
               <h3 className="font-serif text-2xl sm:text-3xl text-[#421824] mb-2">
-                Thank You, {name || invitee.name}!
+                Thank You, {name || invitee.name || 'Honoured Guest'}!
               </h3>
-              <p className="font-serif italic text-base sm:text-lg text-[#613944] max-w-md mx-auto mb-4">
-                {feedbackMessage || 'Your response has been received. We look forward to celebrating with you!'}
-              </p>
-              <div className="inline-block px-4 py-2 bg-[#FFF0F4] rounded-full border border-[#FCD8E3] text-xs font-sans text-[#892640] font-medium">
-                Attendance:{' '}
-                <strong className="text-[#C93E64]">
-                  {attendance === 'attending' ? 'Joyfully Attending' : 'Regretfully Declining'}
-                </strong>
-                {attendance === 'attending' && ` (${guestCount} Guest${guestCount > 1 ? 's' : ''})`}
-              </div>
+              
+              {submittedAttendance === 'attending' ? (
+                <>
+                  <p className="font-serif italic text-base sm:text-lg text-[#613944] max-w-md mx-auto mb-4 leading-relaxed">
+                    We are thrilled that you will be joining us to celebrate our wedding. We look forward to seeing you on Wednesday, 14 October 2026 at Dukes Lounge!
+                  </p>
+                  <div className="inline-block px-4 py-2 bg-[#FFF0F4] rounded-full border border-[#FCD8E3] text-xs font-sans text-[#892640] font-medium">
+                    Attendance: <strong className="text-[#C93E64]">Joyfully Attending</strong> ({guestCount} Guest{guestCount > 1 ? 's' : ''})
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="font-serif italic text-base sm:text-lg text-[#7A4B56] max-w-md mx-auto mb-4 leading-relaxed">
+                    We will miss your presence on our special day, but we truly appreciate your heartfelt wishes and warm blessings from afar!
+                  </p>
+                  <div className="inline-block px-4 py-2 bg-slate-100 rounded-full border border-slate-300 text-xs font-sans text-slate-700 font-medium">
+                    Attendance: <strong>Regretfully Declining</strong>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -120,12 +130,12 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
                         : 'border-[#FCD8E3] text-[#7A4B56] hover:bg-[#FFF5F7]'
                     }`}
                   >
-                    <span>🕊️</span> Regretfully Decline
+                    <span>🕊️</span> Decline
                   </button>
                 </div>
               </div>
 
-              {/* Number of Guests (Only if attending) */}
+              {/* Number of Guests (Only visible if attending) */}
               {attendance === 'attending' && (
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
@@ -133,7 +143,7 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
                       Number of Guests Attending
                     </label>
                     <span className="text-[0.7rem] text-[#9E737F]">
-                      (Maximum allocated: {maxGuests})
+                      (Max: {maxGuests})
                     </span>
                   </div>
 
@@ -151,7 +161,7 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
                 </div>
               )}
 
-              {/* Guest Names if more than 1 */}
+              {/* Guest Names if more than 1 and attending */}
               {attendance === 'attending' && guestCount > 1 && (
                 <div>
                   <label className="block font-cinzel text-xs uppercase tracking-wider text-[#421824] font-semibold mb-1.5">
@@ -190,7 +200,7 @@ export const RsvpForm: React.FC<RsvpFormProps> = ({ invitee }) => {
                   rows={3}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Leave a heartfelt message or note for the couple..."
+                  placeholder="Leave a heartfelt message or blessing for the couple..."
                   className="w-full px-4 py-3 rounded-lg border border-[#FCD8E3] focus:border-[#C93E64] outline-none text-sm text-[#421824] bg-[#FFF5F7]"
                 />
               </div>

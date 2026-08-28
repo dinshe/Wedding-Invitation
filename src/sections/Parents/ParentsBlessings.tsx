@@ -20,13 +20,13 @@ export const ParentsBlessings: React.FC = () => {
             </span>
             <div className="font-serif text-lg sm:text-xl text-[#421824] leading-snug">
               {weddingConfig.parents.groom.map((line, idx) => (
-                <p key={idx} className={line === '&' ? 'font-script text-base text-[#C93E64] my-0.5' : ''}>
+                <p key={idx} className={line === '&' ? 'font-serif italic text-base text-[#C93E64] my-0.5' : ''}>
                   {line}
                 </p>
               ))}
             </div>
             <p className="font-sans text-xs text-[#9E737F] mt-2">
-              Son of Mrs. Hemali & (Late) Mr. Salgado
+              Son of Mrs. Hemali &amp; (Late) Mr. Salgado
             </p>
           </div>
 
@@ -36,14 +36,12 @@ export const ParentsBlessings: React.FC = () => {
               Bride's Parents
             </span>
             <div className="font-serif text-lg sm:text-xl text-[#421824] leading-snug">
-              {weddingConfig.parents.bride.map((line, idx) => (
-                <p key={idx}>
-                  {line}
-                </p>
-              ))}
+              <p>Mrs. Krishanthi Amarasena</p>
+              <p className="font-serif italic text-base text-[#C93E64] my-0.5">and</p>
+              <p>Mr. Jayantha Liyana Wanniarachchi</p>
             </div>
             <p className="font-sans text-xs text-[#9E737F] mt-2">
-              Daughter of Mr. & Mrs. Wanniarachchi
+              Daughter of Mrs. Krishanthi Amarasena &amp; Mr. Jayantha Liyana Wanniarachchi
             </p>
           </div>
         </div>

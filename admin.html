@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal — Mayurika &amp; Yashodha Wedding</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --rose-50: #FFF5F7;
+      --rose-100: #FEEBF0;
+      --rose-200: #FCD8E3;
+      --rose-300: #F9B8CB;
+      --rose-600: #C93E64;
+      --rose-700: #A82E4E;
+      --rose-800: #892640;
+      --rose-900: #421824;
+      --rose-gold: #B85D73;
+      --text-dark: #421824;
+      --text-muted: #8E6D77;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-cinzel: 'Cinzel', serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--rose-50);
+      background-image: 
+        radial-gradient(#F5CCD7 0.8px, transparent 0.8px), 
+        radial-gradient(#FBE4EB 0.8px, #FFF5F7 0.8px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Auth Gate Overlay */
+    #authGate {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #FFF0F4 40%, #FCE0E8 80%, #F7C6D3 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: #FFFFFF;
+      border: 1px solid var(--rose-200);
+      border-radius: 16px;
+      padding: 2.8rem 2.2rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 45px -10px rgba(137, 38, 64, 0.18);
+    }
+
+    .monogram-badge {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--rose-100);
+      border: 1px solid var(--rose-300);
+      color: var(--rose-800);
+      font-family: var(--font-cinzel);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 0.85rem 1.2rem;
+      border: 1px solid var(--rose-200);
+      border-radius: 10px;
+      background: var(--rose-50);
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      outline: none;
+      transition: all 0.25s ease;
+      font-family: var(--font-sans);
+    }
+
+    .admin-input:focus {
+      border-color: var(--rose-600);
+      box-shadow: 0 0 0 3px rgba(201, 62, 100, 0.15);
+      background: #FFFFFF;
+    }
+
+    .btn-luxury {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #B84763 0%, #892640 100%);
+      color: #FFFFFF;
+      font-family: var(--font-cinzel);
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 0.85rem 1.8rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      box-shadow: 0 8px 20px -4px rgba(137, 38, 64, 0.35);
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-luxury:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px -4px rgba(137, 38, 64, 0.45);
+      background: linear-gradient(135deg, #C95572 0%, #9D2E4A 100%);
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      border: 1px solid var(--rose-300);
+      color: var(--rose-800);
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 0.65rem 1.3rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-outline:hover {
+      background: var(--rose-100);
+      border-color: var(--rose-600);
+    }
+
+    /* Main Dashboard Layout */
+    .top-header {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rose-200);
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--rose-200);
+      border-radius: 14px;
+      padding: 1.4rem;
+      box-shadow: 0 4px 15px rgba(137, 38, 64, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose-300), var(--rose-600));
+    }
+
+    .kpi-num {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      font-weight: 600;
+      color: var(--rose-900);
+      line-height: 1;
+      margin: 0.4rem 0 0.2rem;
+    }
+
+    .kpi-label {
+      font-family: var(--font-cinzel);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Controls & Table */
+    .controls-bar {
+      background: #FFFFFF;
+      border: 1px solid var(--rose-200);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--rose-200);
+      background: var(--rose-50);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--rose-800);
+      color: #FFFFFF;
+      border-color: var(--rose-800);
+    }
+
+    .table-wrapper {
+      background: #FFFFFF;
+      border: 1px solid var(--rose-200);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(137, 38, 64, 0.06);
+    }
+
+    .guest-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .guest-table th {
+      background: var(--rose-800);
+      color: #FFFFFF;
+      font-family: var(--font-cinzel);
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 1rem 1.2rem;
+      font-weight: 600;
+    }
+
+    .guest-table td {
+      padding: 1.1rem 1.2rem;
+      border-bottom: 1px solid var(--rose-100);
+      vertical-align: middle;
+    }
+
+    .guest-table tr:hover {
+      background: #FFF9FA;
+    }
+
+    .badge-attending {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #E6F4EA;
+      color: #137333;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-declining {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #FCE8E6;
+      color: #C5221F;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(40, 10, 20, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid var(--rose-200);
+      width: 100%;
+      max-width: 500px;
+      padding: 2.2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       01. PASSWORD AUTHENTICATION GATE
+       ============================================================ -->
+  <div id="authGate">
+    <div class="auth-card">
+      <div class="monogram-badge">M &amp; Y</div>
+      <h2 style="font-family:var(--font-serif); font-size:2rem; color:var(--text-dark); margin-bottom:0.4rem;">
+        Wedding Admin Portal
+      </h2>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.8rem;">
+        Mayurika &amp; Yashodha • 14 October 2026<br />
+        Enter passcode to access guest submissions
+      </p>
+
+      <form id="authForm" onsubmit="handleAuth(event)">
+        <div style="margin-bottom:1.4rem;">
+          <input
+            type="password"
+            id="adminPinInput"
+            class="admin-input"
+            placeholder="Enter Admin PIN (Default: 141026)"
+            required
+            autocomplete="current-password"
+            style="text-align:center; font-size:1.1rem; letter-spacing:3px;"
+          />
+        </div>
+        <button type="submit" class="btn-luxury" style="width:100%;">
+          Unlock Portal 🔒
+        </button>
+        <p id="authError" style="color:#C5221F; font-size:0.8rem; margin-top:0.8rem; display:none;">
+          Invalid Passcode. Please try again.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       02. ADMIN DASHBOARD NAVBAR
+       ============================================================ -->
+  <header class="top-header">
+    <div style="display:flex; align-items:center; gap:0.8rem;">
+      <span class="monogram-badge" style="width:36px; height:36px; font-size:0.75rem; margin-bottom:0;">M&amp;Y</span>
+      <div>
+        <h1 style="font-family:var(--font-serif); font-size:1.4rem; line-height:1.1; color:var(--text-dark);">
+          Mayurika &amp; Yashodha
+        </h1>
+        <p style="font-family:var(--font-cinzel); font-size:0.65rem; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase;">
+          RSVP &amp; Guest Management Dashboard
+        </p>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+      <button onclick="openSettingsModal()" class="btn-outline" title="Configure Google Sheets Backend">
+        ⚙️ Backend Sync
+      </button>
+      <button onclick="openAddModal()" class="btn-outline" title="Add manual RSVP confirmation">
+        ➕ Add RSVP
+      </button>
+      <button onclick="exportToCsv()" class="btn-luxury" style="padding:0.65rem 1.4rem; font-size:0.75rem;">
+        📥 Export CSV
+      </button>
+      <button onclick="handleLogout()" class="btn-outline" style="border-color:#FCD8E3; color:#A82E4E;">
+        🚪 Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       03. MAIN DASHBOARD CONTENT
+       ============================================================ -->
+  <main class="container">
+    <!-- Live KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Submissions</span>
+        <div class="kpi-num" id="kpiTotal">0</div>
+        <p style="font-size:0.75rem; color:var(--text-muted);">Responses received</p>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Joyfully Attending</span>
+        <div class="kpi-num" id="kpiAttending" style="color:#137333;">0</div>
+        <p style="font-size:0.75rem; color:var(--text-muted);"><span id="kpiHeadcount">0</span> Total Guests Headcount</p>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Regretfully Declining</span>
+        <div class="kpi-num" id="kpiDeclining" style="color:#C5221F;">0</div>
+        <p style="font-size:0.75rem; color:var(--text-muted);">Unable to attend</p>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Heartfelt Wishes</span>
+        <div class="kpi-num" id="kpiWishes" style="color:var(--rose-600);">0</div>
+        <p style="font-size:0.75rem; color:var(--text-muted);">Blessings left by guests</p>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All (<span id="countAll">0</span>)</button>
+        <button class="filter-btn" onclick="setFilter('attending', this)">💍 Attending (<span id="countAttending">0</span>)</button>
+        <button class="filter-btn" onclick="setFilter('declining', this)">🕊️ Declining (<span id="countDeclining">0</span>)</button>
+        <button class="filter-btn" onclick="setFilter('wishes', this)">💬 With Wishes (<span id="countWishes">0</span>)</button>
+      </div>
+
+      <div style="display:flex; gap:0.6rem; flex:1; max-width:380px;">
+        <input
+          type="text"
+          id="searchInput"
+          class="admin-input"
+          placeholder="🔍 Search by guest name, phone..."
+          oninput="renderTable()"
+          style="padding:0.55rem 1rem; font-size:0.85rem;"
+        />
+        <button onclick="copyCatererSummary()" class="btn-outline" title="Copy attendance summary for venue/caterer">
+          📋 Summary
+        </button>
+      </div>
+    </div>
+
+    <!-- RSVP Data Table -->
+    <div class="table-wrapper">
+      <div style="overflow-x:auto;">
+        <table class="guest-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Invitee Name</th>
+              <th>Guests</th>
+              <th>Contact Phone</th>
+              <th>Warm Wishes / Message</th>
+              <th>Submitted At</th>
+            </tr>
+          </thead>
+          <tbody id="guestTableBody">
+            <tr>
+              <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
+                Loading guest submissions...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       04. BACKEND CONNECTION MODAL
+       ============================================================ -->
+  <div id="settingsModal" class="modal-backdrop" onclick="closeSettingsModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="font-family:var(--font-serif); font-size:1.8rem; margin-bottom:0.4rem;">
+        Google Sheets Backend Sync
+      </h3>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.4rem;">
+        Paste your deployed Google Apps Script Web App URL to sync live data directly with your spreadsheet.
+      </p>
+
+      <div style="margin-bottom:1.2rem;">
+        <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.4rem;">
+          Web App URL
+        </label>
+        <input
+          type="url"
+          id="backendUrlInput"
+          class="admin-input"
+          placeholder="https://script.google.com/macros/s/.../exec"
+        />
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.8rem; margin-top:1.5rem;">
+        <button onclick="closeSettingsModal()" class="btn-outline">Cancel</button>
+        <button onclick="saveBackendSettings()" class="btn-luxury">Save &amp; Sync</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       05. MANUAL RSVP ADD MODAL
+       ============================================================ -->
+  <div id="addModal" class="modal-backdrop" onclick="closeAddModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="font-family:var(--font-serif); font-size:1.8rem; margin-bottom:0.4rem;">
+        Add Manual Guest RSVP
+      </h3>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.4rem;">
+        Manually record an RSVP from a guest who responded via phone or in person.
+      </p>
+
+      <form onsubmit="handleManualAdd(event)">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.3rem;">Guest Name *</label>
+          <input type="text" id="manualName" class="admin-input" required placeholder="e.g. Mr. Kamalanathan" />
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.3rem;">Attendance *</label>
+          <select id="manualAttendance" class="admin-input" onchange="toggleManualGuestCount()">
+            <option value="attending">💍 Joyfully Attending</option>
+            <option value="declining">🕊️ Regretfully Declining</option>
+          </select>
+        </div>
+
+        <div id="manualGuestCountGroup" style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.3rem;">Number of Guests</label>
+          <input type="number" id="manualCount" class="admin-input" min="1" max="10" value="1" />
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.3rem;">Phone Number</label>
+          <input type="tel" id="manualPhone" class="admin-input" placeholder="e.g. 077 123 4567" />
+        </div>
+
+        <div style="margin-bottom:1.2rem;">
+          <label style="display:block; font-size:0.75rem; font-family:var(--font-cinzel); font-weight:600; margin-bottom:0.3rem;">Notes / Wishes</label>
+          <textarea id="manualMessage" class="admin-input" rows="2" placeholder="Any special notes or well wishes..."></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.8rem;">
+          <button type="button" onclick="closeAddModal()" class="btn-outline">Cancel</button>
+          <button type="submit" class="btn-luxury">Save RSVP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT DATA & LOGIC ENGINE
+       ============================================================ -->
+  <script>
+    const VALID_PINS = ['141026', 'wedding2026', 'admin123'];
+    let currentFilter = 'all';
+    let rsvpList = [];
+
+    // Check existing session
+    if (sessionStorage.getItem('wedding_admin_auth') === 'true') {
+      document.getElementById('authGate').style.display = 'none';
+      loadDashboardData();
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      const pin = document.getElementById('adminPinInput').value.trim();
+      if (VALID_PINS.includes(pin)) {
+        sessionStorage.setItem('wedding_admin_auth', 'true');
+        sessionStorage.setItem('admin_pin', pin);
+        document.getElementById('authGate').style.display = 'none';
+        loadDashboardData();
+      } else {
+        document.getElementById('authError').style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('wedding_admin_auth');
+      sessionStorage.removeItem('admin_pin');
+      window.location.reload();
+    }
+
+    // Load Data from Google Sheet API or LocalStorage
+    async function loadDashboardData() {
+      const savedUrl = localStorage.getItem('wedding_apps_script_url');
+      const pin = sessionStorage.getItem('admin_pin') || '141026';
+
+      // Load local cache first
+      let localData = [];
+      try {
+        localData = JSON.parse(localStorage.getItem('wedding_local_rsvps') || '[]');
+      } catch(e) {}
+
+      // If no local data, supply demo sample for immediate viewing
+      if (localData.length === 0) {
+        localData = [
+          {
+            id: 'RSVP-DEMO-1',
+            name: 'Mr. Tharindu Perera',
+            attendance: 'attending',
+            guestCount: 2,
+            guestNames: 'Mrs. Anoma Perera',
+            phone: '0771234567',
+            message: 'Wishing Mayurika & Yashodha a lifetime of abundant love and happiness!',
+            submittedAt: '28/08/2026, 14:30:00'
+          },
+          {
+            id: 'RSVP-DEMO-2',
+            name: 'Dr. Sanjeewa Silva',
+            attendance: 'attending',
+            guestCount: 1,
+            guestNames: '',
+            phone: '0719876543',
+            message: 'Heartiest congratulations to the wonderful couple!',
+            submittedAt: '28/08/2026, 15:10:00'
+          },
+          {
+            id: 'RSVP-DEMO-3',
+            name: 'Ms. Dilani Fernando',
+            attendance: 'declining',
+            guestCount: 0,
+            guestNames: '',
+            phone: '0754433221',
+            message: 'Sending all our warmest blessings for your sacred wedding ceremony!',
+            submittedAt: '28/08/2026, 16:00:00'
+          }
+        ];
+      }
+
+      rsvpList = localData;
+
+      // Try fetching from Google Sheet if URL configured
+      if (savedUrl) {
+        try {
+          const fetchUrl = `${savedUrl}?action=getAdminData&pin=${encodeURIComponent(pin)}`;
+          const response = await fetch(fetchUrl);
+          const json = await response.json();
+          if (json.status === 'success' && json.data && json.data.rsvps) {
+            rsvpList = json.data.rsvps;
+          }
+        } catch(err) {
+          console.warn('Could not sync with Google Sheets, displaying cached/local submissions.', err);
+        }
+      }
+
+      updateKpis();
+      renderTable();
+    }
+
+    function updateKpis() {
+      let attendingCount = 0;
+      let totalHeadcount = 0;
+      let decliningCount = 0;
+      let wishesCount = 0;
+
+      rsvpList.forEach(r => {
+        const att = (r.attendance || '').toLowerCase();
+        if (att === 'attending' || att === 'joyfully accept') {
+          attendingCount++;
+          totalHeadcount += (parseInt(r.guestCount, 10) || 1);
+        } else {
+          decliningCount++;
+        }
+        if (r.message && r.message.trim().length > 0) {
+          wishesCount++;
+        }
+      });
+
+      document.getElementById('kpiTotal').innerText = rsvpList.length;
+      document.getElementById('kpiAttending').innerText = attendingCount;
+      document.getElementById('kpiHeadcount').innerText = totalHeadcount;
+      document.getElementById('kpiDeclining').innerText = decliningCount;
+      document.getElementById('kpiWishes').innerText = wishesCount;
+
+      document.getElementById('countAll').innerText = rsvpList.length;
+      document.getElementById('countAttending').innerText = attendingCount;
+      document.getElementById('countDeclining').innerText = decliningCount;
+      document.getElementById('countWishes').innerText = wishesCount;
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    }
+
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const tbody = document.getElementById('guestTableBody');
+
+      const filtered = rsvpList.filter(r => {
+        const att = (r.attendance || '').toLowerCase();
+        const matchesFilter = 
+          currentFilter === 'all' ? true :
+          currentFilter === 'attending' ? (att === 'attending' || att === 'joyfully accept') :
+          currentFilter === 'declining' ? (att === 'declining' || att === 'decline') :
+          currentFilter === 'wishes' ? (r.message && r.message.trim().length > 0) : true;
+
+        const matchesSearch = !search ? true :
+          (r.name && r.name.toLowerCase().includes(search)) ||
+          (r.phone && r.phone.includes(search)) ||
+          (r.message && r.message.toLowerCase().includes(search));
+
+        return matchesFilter && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
+              No matching guest responses found.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const isAttending = (r.attendance || '').toLowerCase().includes('attend');
+        const badge = isAttending
+          ? `<span class="badge-attending">💍 Attending</span>`
+          : `<span class="badge-declining">🕊️ Declining</span>`;
+
+        const phoneDisplay = r.phone
+          ? `<div>
+              <a href="tel:${r.phone}" style="color:var(--rose-700); text-decoration:none; font-weight:600;">📞 ${r.phone}</a>
+              <a href="https://wa.me/94${r.phone.replace(/[^0-9]/g, '').replace(/^0/, '')}" target="_blank" style="display:block; font-size:0.75rem; color:#047857; text-decoration:none; margin-top:2px;">💬 WhatsApp</a>
+            </div>`
+          : `<span style="color:var(--text-muted); font-size:0.8rem;">—</span>`;
+
+        const countDisplay = isAttending
+          ? `<strong>${r.guestCount || 1}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${r.guestCount > 1 ? 'Guests' : 'Guest'}</span>${r.guestNames ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">(${r.guestNames})</div>` : ''}`
+          : `<span style="color:var(--text-muted);">0</span>`;
+
+        return `
+          <tr>
+            <td>${badge}</td>
+            <td><strong style="color:var(--rose-900);">${r.name || 'Honoured Guest'}</strong></td>
+            <td>${countDisplay}</td>
+            <td>${phoneDisplay}</td>
+            <td style="max-width:320px; font-style:italic; color:var(--text-dark);">${r.message ? `“${r.message}”` : `<span style="color:var(--text-muted); font-style:normal;">—</span>`}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">${r.submittedAt || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Export Data to CSV
+    function exportToCsv() {
+      if (rsvpList.length === 0) {
+        alert('No guest data available to export.');
+        return;
+      }
+
+      const headers = ['RSVP ID', 'Guest Name', 'Attendance', 'Guest Count', 'Accompanying Names', 'Phone Number', 'Message / Wishes', 'Submitted At'];
+      const rows = rsvpList.map(r => [
+        `"${r.id || ''}"`,
+        `"${(r.name || '').replace(/"/g, '""')}"`,
+        `"${r.attendance || ''}"`,
+        `"${r.guestCount || 0}"`,
+        `"${(r.guestNames || '').replace(/"/g, '""')}"`,
+        `"${r.phone || ''}"`,
+        `"${(r.message || '').replace(/"/g, '""')}"`,
+        `"${r.submittedAt || ''}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Mayurika-Yashodha-RSVP-Report-${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Copy Summary Breakdown to Clipboard
+    function copyCatererSummary() {
+      let attendingCount = 0;
+      let totalHeadcount = 0;
+      let decliningCount = 0;
+
+      const attendingNames = [];
+
+      rsvpList.forEach(r => {
+        const att = (r.attendance || '').toLowerCase();
+        if (att === 'attending' || att === 'joyfully accept') {
+          attendingCount++;
+          const count = parseInt(r.guestCount, 10) || 1;
+          totalHeadcount += count;
+          attendingNames.push(`• ${r.name} (${count} guest${count > 1 ? 's' : ''})`);
+        } else {
+          decliningCount++;
+        }
+      });
+
+      const summaryText = 
+`💍 MAYURIKA & YASHODHA WEDDING — RSVP SUMMARY
+Date: Wednesday, 14 October 2026
+Venue: Dukes Lounge, Hotel Green Court, Homagama
+
+📊 OVERVIEW:
+• Total Responses: ${rsvpList.length}
+• Joyfully Attending Parties: ${attendingCount}
+• Total Guests Headcount: ${totalHeadcount}
+• Regretfully Declining: ${decliningCount}
+
+👥 CONFIRMED ATTENDEE LIST:
+${attendingNames.join('\n')}
+
+Generated: ${new Date().toLocaleDateString('en-GB')}`;
+
+      navigator.clipboard.writeText(summaryText).then(() => {
+        alert('📋 Summary report copied to clipboard! You can now paste it directly into WhatsApp or email.');
+      });
+    }
+
+    // Modal Operations
+    function openSettingsModal() {
+      document.getElementById('backendUrlInput').value = localStorage.getItem('wedding_apps_script_url') || '';
+      document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function saveBackendSettings() {
+      const url = document.getElementById('backendUrlInput').value.trim();
+      localStorage.setItem('wedding_apps_script_url', url);
+      closeSettingsModal();
+      loadDashboardData();
+    }
+
+    function openAddModal() {
+      document.getElementById('addModal').classList.add('active');
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').classList.remove('active');
+    }
+
+    function toggleManualGuestCount() {
+      const att = document.getElementById('manualAttendance').value;
+      document.getElementById('manualGuestCountGroup').style.display = att === 'attending' ? 'block' : 'none';
+    }
+
+    function handleManualAdd(e) {
+      e.preventDefault();
+      const name = document.getElementById('manualName').value.trim();
+      const attendance = document.getElementById('manualAttendance').value;
+      const count = attendance === 'attending' ? parseInt(document.getElementById('manualCount').value, 10) : 0;
+      const phone = document.getElementById('manualPhone').value.trim();
+      const message = document.getElementById('manualMessage').value.trim();
+
+      const newEntry = {
+        id: 'RSVP-MANUAL-' + Date.now(),
+        name: name,
+        attendance: attendance,
+        guestCount: count,
+        guestNames: '',
+        phone: phone,
+        message: message,
+        submittedAt: new Date().toLocaleString('en-GB')
+      };
+
+      rsvpList.unshift(newEntry);
+      localStorage.setItem('wedding_local_rsvps', JSON.stringify(rsvpList));
+      
+      closeAddModal();
+      updateKpis();
+      renderTable();
+      alert('RSVP added successfully!');
+    }
+  </script>
+</body>
+</html>

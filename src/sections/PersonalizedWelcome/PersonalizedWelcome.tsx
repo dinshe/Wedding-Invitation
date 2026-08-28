@@ -1,12 +1,15 @@
 import React from 'react';
 import { InviteeInfo } from '../../types/wedding';
-import { weddingConfig } from '../../config/wedding';
 
 interface PersonalizedWelcomeProps {
   invitee: InviteeInfo;
 }
 
 export const PersonalizedWelcome: React.FC<PersonalizedWelcomeProps> = ({ invitee }) => {
+  const seatsText = invitee.allowedGuests === 1
+    ? 'One seat has been reserved especially for you.'
+    : `${invitee.allowedGuests} seats have been reserved especially for you.`;
+
   return (
     <section className="py-12 sm:py-20 px-4">
       <div className="max-w-2xl mx-auto text-center">
@@ -17,30 +20,32 @@ export const PersonalizedWelcome: React.FC<PersonalizedWelcomeProps> = ({ invite
           <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-[#F5BCCB] pointer-events-none" />
           <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-[#F5BCCB] pointer-events-none" />
 
-          {/* Subtitle */}
-          <p className="font-cinzel text-xs tracking-[3px] text-[#A82E4E] font-semibold uppercase mb-3">
-            Personal Invitation
-          </p>
-
           {/* Salutation */}
           <h2 className="font-serif text-3xl sm:text-4xl text-[#421824] mb-4">
             {invitee.isPersonalized ? `Dear ${invitee.name},` : 'Dear Family & Friends,'}
           </h2>
 
-          {/* Official Invitation Message from Original Reference */}
-          <p className="font-serif italic text-lg sm:text-xl text-[#613944] leading-relaxed max-w-xl mx-auto my-4">
-            "{weddingConfig.invitationMessage}"
+          {/* Romantic Quote */}
+          <p className="font-serif italic text-xl sm:text-2xl text-[#421824] leading-relaxed max-w-xl mx-auto mb-4">
+            “Two hearts, one beautiful promise, and a lifetime of love ahead…”
+          </p>
+
+          {/* Invitation Stanza */}
+          <p className="font-serif text-base sm:text-lg text-[#613944] leading-relaxed max-w-lg mx-auto mb-6">
+            We would be delighted to have you with us<br className="hidden sm:inline" />
+            as we celebrate the beginning of our forever.
           </p>
 
           {/* Reserved Seats Pill */}
-          <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-[#FFF0F4] border border-[#FCD8E3] text-xs font-sans text-[#892640] font-medium">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FFF0F4] border border-[#FCD8E3] text-xs sm:text-sm font-sans text-[#892640] font-medium mb-5">
             <span>🌸</span>
-            <span>
-              {invitee.allowedGuests === 1
-                ? 'We have reserved 1 seat in your honour'
-                : `We have reserved ${invitee.allowedGuests} seats in your honour`}
-            </span>
+            <span>{seatsText}</span>
           </div>
+
+          {/* Closing Warm Blessing */}
+          <p className="font-serif italic text-base sm:text-lg text-[#892640] font-medium">
+            With love, we look forward to celebrating with you!
+          </p>
         </div>
       </div>
     </section>
