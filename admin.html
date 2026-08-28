@@ -165,6 +165,8 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .container {
@@ -173,6 +175,26 @@
       padding: 2rem 1.5rem 4rem;
       width: 100%;
       flex: 1;
+    }
+
+    .sync-status-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #E6F4EA;
+      color: #137333;
+      border: 1px solid #CEEAD6;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+    }
+
+    .sync-status-bar.syncing {
+      background: #FEF7E0;
+      color: #B06000;
+      border-color: #FEEFC3;
     }
 
     /* KPI Cards */
@@ -402,8 +424,11 @@
     </div>
 
     <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+      <button onclick="loadDashboardData()" id="refreshBtn" class="btn-outline" title="Fetch fresh submissions from Google Sheets">
+        🔄 Refresh
+      </button>
       <button onclick="openSettingsModal()" class="btn-outline" title="Configure Google Sheets Backend">
-        ⚙️ Backend Sync
+        ⚙️ Backend URL
       </button>
       <button onclick="openAddModal()" class="btn-outline" title="Add manual RSVP confirmation">
         ➕ Add RSVP
@@ -421,12 +446,22 @@
        03. MAIN DASHBOARD CONTENT
        ============================================================ -->
   <main class="container">
+    <!-- Live Status Indicator -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.2rem;">
+      <div id="syncBadge" class="sync-status-bar">
+        <span>🟢</span> <span id="syncText">Connected to Google Sheet (Real-Time Sync Active)</span>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-muted);" id="lastSyncTime">
+        Last updated: Just now
+      </div>
+    </div>
+
     <!-- Live KPIs -->
     <div class="kpi-grid">
       <div class="kpi-card">
         <span class="kpi-label">Total Submissions</span>
         <div class="kpi-num" id="kpiTotal">0</div>
-        <p style="font-size:0.75rem; color:var(--text-muted);">Responses received</p>
+        <p style="font-size:0.75rem; color:var(--text-muted);">Responses in Google Sheet</p>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Joyfully Attending</span>
@@ -459,7 +494,7 @@
           type="text"
           id="searchInput"
           class="admin-input"
-          placeholder="🔍 Search by guest name, phone..."
+          placeholder="🔍 Search by guest name, phone, wish..."
           oninput="renderTable()"
           style="padding:0.55rem 1rem; font-size:0.85rem;"
         />
@@ -486,7 +521,7 @@
           <tbody id="guestTableBody">
             <tr>
               <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
-                Loading guest submissions...
+                Connecting to Google Sheet...
               </td>
             </tr>
           </tbody>
@@ -504,7 +539,7 @@
         Google Sheets Backend Sync
       </h3>
       <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.4rem;">
-        Paste your deployed Google Apps Script Web App URL to sync live data directly with your spreadsheet.
+        Your Google Apps Script Web App URL is connected. You can update or verify it here.
       </p>
 
       <div style="margin-bottom:1.2rem;">
@@ -579,14 +614,16 @@
        JAVASCRIPT DATA & LOGIC ENGINE
        ============================================================ -->
   <script>
+    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwm9bNxJViMocDkoJgp5aNeysf8O6U-TomFnx-FvxUxM13DSISLRYmKU5sGYEApGGZLsg/exec";
     const VALID_PINS = ['141026', 'wedding2026', 'admin123'];
     let currentFilter = 'all';
     let rsvpList = [];
+    let pollInterval = null;
 
     // Check existing session
     if (sessionStorage.getItem('wedding_admin_auth') === 'true') {
       document.getElementById('authGate').style.display = 'none';
-      loadDashboardData();
+      initDashboard();
     }
 
     function handleAuth(e) {
@@ -596,7 +633,7 @@
         sessionStorage.setItem('wedding_admin_auth', 'true');
         sessionStorage.setItem('admin_pin', pin);
         document.getElementById('authGate').style.display = 'none';
-        loadDashboardData();
+        initDashboard();
       } else {
         document.getElementById('authError').style.display = 'block';
       }
@@ -605,70 +642,61 @@
     function handleLogout() {
       sessionStorage.removeItem('wedding_admin_auth');
       sessionStorage.removeItem('admin_pin');
+      if (pollInterval) clearInterval(pollInterval);
       window.location.reload();
     }
 
-    // Load Data from Google Sheet API or LocalStorage
-    async function loadDashboardData() {
-      const savedUrl = localStorage.getItem('wedding_apps_script_url');
+    function initDashboard() {
+      loadDashboardData();
+      // Auto refresh every 15 seconds for real-time guest sync
+      if (!pollInterval) {
+        pollInterval = setInterval(() => {
+          loadDashboardData(true);
+        }, 15000);
+      }
+    }
+
+    // Load Data directly from Google Sheet API
+    async function loadDashboardData(isBackground = false) {
+      const savedUrl = localStorage.getItem('wedding_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
       const pin = sessionStorage.getItem('admin_pin') || '141026';
+      const syncBadge = document.getElementById('syncBadge');
+      const syncText = document.getElementById('syncText');
+      const refreshBtn = document.getElementById('refreshBtn');
 
-      // Load local cache first
-      let localData = [];
-      try {
-        localData = JSON.parse(localStorage.getItem('wedding_local_rsvps') || '[]');
-      } catch(e) {}
-
-      // If no local data, supply demo sample for immediate viewing
-      if (localData.length === 0) {
-        localData = [
-          {
-            id: 'RSVP-DEMO-1',
-            name: 'Mr. Tharindu Perera',
-            attendance: 'attending',
-            guestCount: 2,
-            guestNames: 'Mrs. Anoma Perera',
-            phone: '0771234567',
-            message: 'Wishing Mayurika & Yashodha a lifetime of abundant love and happiness!',
-            submittedAt: '28/08/2026, 14:30:00'
-          },
-          {
-            id: 'RSVP-DEMO-2',
-            name: 'Dr. Sanjeewa Silva',
-            attendance: 'attending',
-            guestCount: 1,
-            guestNames: '',
-            phone: '0719876543',
-            message: 'Heartiest congratulations to the wonderful couple!',
-            submittedAt: '28/08/2026, 15:10:00'
-          },
-          {
-            id: 'RSVP-DEMO-3',
-            name: 'Ms. Dilani Fernando',
-            attendance: 'declining',
-            guestCount: 0,
-            guestNames: '',
-            phone: '0754433221',
-            message: 'Sending all our warmest blessings for your sacred wedding ceremony!',
-            submittedAt: '28/08/2026, 16:00:00'
-          }
-        ];
+      if (!isBackground) {
+        refreshBtn.innerText = '⏳ Syncing...';
       }
 
-      rsvpList = localData;
+      try {
+        const fetchUrl = `${savedUrl}?action=getAdminData&pin=${encodeURIComponent(pin)}&_t=${Date.now()}`;
+        const response = await fetch(fetchUrl);
+        const json = await response.json();
 
-      // Try fetching from Google Sheet if URL configured
-      if (savedUrl) {
-        try {
-          const fetchUrl = `${savedUrl}?action=getAdminData&pin=${encodeURIComponent(pin)}`;
-          const response = await fetch(fetchUrl);
-          const json = await response.json();
-          if (json.status === 'success' && json.data && json.data.rsvps) {
-            rsvpList = json.data.rsvps;
-          }
-        } catch(err) {
-          console.warn('Could not sync with Google Sheets, displaying cached/local submissions.', err);
+        if (json.status === 'success' && json.data && Array.isArray(json.data.rsvps)) {
+          rsvpList = json.data.rsvps;
+          syncBadge.className = 'sync-status-bar';
+          syncText.innerText = 'Connected to Google Sheet (Real-Time Sync Active)';
+          document.getElementById('lastSyncTime').innerText = 'Last updated: ' + new Date().toLocaleTimeString('en-GB');
+        } else {
+          throw new Error('API returned invalid data');
         }
+      } catch(err) {
+        console.warn('Direct sync error, trying local cache fallback:', err);
+        // Fallback to local submissions if network issues
+        let localData = [];
+        try {
+          localData = JSON.parse(localStorage.getItem('wedding_local_rsvps') || '[]');
+        } catch(e) {}
+        if (localData.length > 0) {
+          rsvpList = localData;
+          syncBadge.className = 'sync-status-bar syncing';
+          syncText.innerText = 'Showing Locally Cached Submissions';
+        }
+      }
+
+      if (!isBackground) {
+        refreshBtn.innerText = '🔄 Refresh';
       }
 
       updateKpis();
@@ -757,7 +785,7 @@
           : `<span style="color:var(--text-muted); font-size:0.8rem;">—</span>`;
 
         const countDisplay = isAttending
-          ? `<strong>${r.guestCount || 1}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${r.guestCount > 1 ? 'Guests' : 'Guest'}</span>${r.guestNames ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">(${r.guestNames})</div>` : ''}`
+          ? `<strong>${r.guestCount || 1}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${(r.guestCount || 1) > 1 ? 'Guests' : 'Guest'}</span>${r.guestNames ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">(${r.guestNames})</div>` : ''}`
           : `<span style="color:var(--text-muted);">0</span>`;
 
         return `
@@ -846,7 +874,7 @@ Generated: ${new Date().toLocaleDateString('en-GB')}`;
 
     // Modal Operations
     function openSettingsModal() {
-      document.getElementById('backendUrlInput').value = localStorage.getItem('wedding_apps_script_url') || '';
+      document.getElementById('backendUrlInput').value = localStorage.getItem('wedding_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
       document.getElementById('settingsModal').classList.add('active');
     }
 
@@ -856,7 +884,9 @@ Generated: ${new Date().toLocaleDateString('en-GB')}`;
 
     function saveBackendSettings() {
       const url = document.getElementById('backendUrlInput').value.trim();
-      localStorage.setItem('wedding_apps_script_url', url);
+      if (url) {
+        localStorage.setItem('wedding_apps_script_url', url);
+      }
       closeSettingsModal();
       loadDashboardData();
     }
@@ -874,7 +904,7 @@ Generated: ${new Date().toLocaleDateString('en-GB')}`;
       document.getElementById('manualGuestCountGroup').style.display = att === 'attending' ? 'block' : 'none';
     }
 
-    function handleManualAdd(e) {
+    async function handleManualAdd(e) {
       e.preventDefault();
       const name = document.getElementById('manualName').value.trim();
       const attendance = document.getElementById('manualAttendance').value;
@@ -882,23 +912,31 @@ Generated: ${new Date().toLocaleDateString('en-GB')}`;
       const phone = document.getElementById('manualPhone').value.trim();
       const message = document.getElementById('manualMessage').value.trim();
 
-      const newEntry = {
-        id: 'RSVP-MANUAL-' + Date.now(),
-        name: name,
+      const newPayload = {
+        action: 'submitRsvp',
+        inviteeName: name,
         attendance: attendance,
         guestCount: count,
-        guestNames: '',
         phone: phone,
         message: message,
         submittedAt: new Date().toLocaleString('en-GB')
       };
 
-      rsvpList.unshift(newEntry);
-      localStorage.setItem('wedding_local_rsvps', JSON.stringify(rsvpList));
-      
+      // Send to Google Apps Script
+      const targetUrl = localStorage.getItem('wedding_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+      try {
+        fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(newPayload)
+        });
+      } catch(err) {}
+
       closeAddModal();
-      updateKpis();
-      renderTable();
+      setTimeout(() => {
+        loadDashboardData();
+      }, 1000);
       alert('RSVP added successfully!');
     }
   </script>

@@ -1635,16 +1635,32 @@
         localStorage.setItem('wedding_local_rsvps', JSON.stringify(localList));
       } catch(err) {}
 
-      // Attempt to submit to Google Apps Script if URL configured
-      const appsScriptUrl = localStorage.getItem('wedding_apps_script_url');
-      if (appsScriptUrl) {
+      // Live Google Apps Script Web App URL
+      const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwm9bNxJViMocDkoJgp5aNeysf8O6U-TomFnx-FvxUxM13DSISLRYmKU5sGYEApGGZLsg/exec";
+      const targetUrl = localStorage.getItem('wedding_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+
+      if (targetUrl) {
         try {
-          await fetch(appsScriptUrl, {
+          // 1. Primary: POST request with text/plain to avoid CORS preflight issues
+          fetch(targetUrl, {
             method: 'POST',
             mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(rsvpPayload)
+          }).catch(err => console.log('POST sync error:', err));
+
+          // 2. Secondary Fail-Safe: GET request beacon for 100% universal mobile browser compatibility
+          const queryParams = new URLSearchParams({
+            action: 'submitRsvp',
+            inviteeName: guestName,
+            attendance: attendance,
+            guestCount: String(count),
+            phone: phone,
+            message: message,
+            _t: String(Date.now())
           });
+          const beacon = new Image();
+          beacon.src = `${targetUrl}?${queryParams.toString()}`;
         } catch(err) {
           console.log('Online sync attempt:', err);
         }

@@ -5,12 +5,12 @@
  * 
  * FEATURES:
  * 1. Automatic Google Sheet creation, tab formatting, column sizing, and colors
- * 2. Secure REST API for RSVP submissions from the digital invitation
+ * 2. Secure REST API for RSVP submissions (both POST and GET fail-safe)
  * 3. Protected Admin API for the Web Admin Portal (Analytics, RSVPs, Wishes)
  * 4. Google Sheets UI Custom Menu ("💍 Wedding Admin") with 1-click tools
  */
 
-const DEFAULT_ADMIN_PIN = "141026"; // Change to your preferred PIN
+const DEFAULT_ADMIN_PIN = "141026"; // Passcode for Admin Portal
 
 /**
  * Trigger: Runs automatically when spreadsheet is opened.
@@ -92,7 +92,6 @@ function setupSpreadsheet() {
   const inviteeHeaders = ['Invitee ID', 'Guest Name', 'Allowed Seats', 'Phone', 'Unique URL Slug', 'Status'];
   if (inviteeSheet.getLastRow() === 0) {
     inviteeSheet.appendRow(inviteeHeaders);
-    // Add sample row
     inviteeSheet.appendRow(['GUEST-001', 'Mr. Tharindu Perera', 1, '0771234567', 'Mr.+Tharindu', 'Invited']);
   } else {
     inviteeSheet.getRange(1, 1, 1, inviteeHeaders.length).setValues([inviteeHeaders]);
@@ -201,6 +200,9 @@ function doGet(e) {
       case 'setup':
         result = setupSpreadsheet();
         break;
+      case 'submitRsvp': // Fail-safe GET support for universal device compatibility
+        result = handleSubmitRsvp(params);
+        break;
       case 'getAdminData':
         result = handleGetAdminData(params.pin || params.password);
         break;
@@ -286,7 +288,7 @@ function handleSubmitRsvp(data) {
   ]);
 
   // If a message/wish is included, also mirror to WISHES tab
-  if (data.message && data.message.trim().length > 0) {
+  if (data.message && String(data.message).trim().length > 0) {
     let wishSheet = ss.getSheetByName('WISHES');
     if (wishSheet) {
       wishSheet.appendRow([
@@ -327,7 +329,7 @@ function handleGetAdminData(pin) {
       const count = parseInt(r[3], 10) || 0;
       const message = String(r[6] || '').trim();
 
-      if (attendance === 'attending') {
+      if (attendance === 'attending' || attendance === 'joyfully accept') {
         attendingCount++;
         totalHeadcount += count > 0 ? count : 1;
       } else {
