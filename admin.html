@@ -449,7 +449,7 @@
     <!-- Live Status Indicator -->
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.2rem;">
       <div id="syncBadge" class="sync-status-bar">
-        <span>🟢</span> <span id="syncText"></span>
+        <span>🟢</span> <span id="syncText">Connected</span>
       </div>
       <div style="font-size:0.75rem; color:var(--text-muted);" id="lastSyncTime">
         Last updated: Just now
@@ -676,7 +676,7 @@
         if (json.status === 'success' && json.data && Array.isArray(json.data.rsvps)) {
           rsvpList = json.data.rsvps;
           syncBadge.className = 'sync-status-bar';
-          syncText.innerText = 'Connected to Google Sheet (Real-Time Sync Active)';
+          syncText.innerText = 'Connected';
           document.getElementById('lastSyncTime').innerText = 'Last updated: ' + new Date().toLocaleTimeString('en-GB');
         } else {
           throw new Error('API returned invalid data');
