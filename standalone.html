@@ -1597,10 +1597,11 @@
     // 7. RSVP Submission Handler with Tailored Attending/Declining Messages & Local Cache Sync
     const rsvpForm = document.getElementById('rsvpForm');
     const rsvpSuccessState = document.getElementById('rsvpSuccessState');
-    const rsvpSubmitBtn = document.getElementById('rsvpSubmitBtn');
-
+    let isRsvpSubmitting = false;
     rsvpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (isRsvpSubmitting) return;
+      isRsvpSubmitting = true;
       rsvpSubmitBtn.innerText = 'Recording RSVP...';
       rsvpSubmitBtn.disabled = true;
 
@@ -1641,26 +1642,16 @@
 
       if (targetUrl) {
         try {
-          // 1. Primary: POST request with text/plain to avoid CORS preflight issues
+          // Single POST request with text/plain to avoid CORS preflight issues.
+          // NOTE: Do NOT add a secondary GET beacon here — Google Apps Script handles
+          // both doGet() and doPost(), so a dual-request strategy causes every
+          // submission to be recorded TWICE in the spreadsheet.
           fetch(targetUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(rsvpPayload)
           }).catch(err => console.log('POST sync error:', err));
-
-          // 2. Secondary Fail-Safe: GET request beacon for 100% universal mobile browser compatibility
-          const queryParams = new URLSearchParams({
-            action: 'submitRsvp',
-            inviteeName: guestName,
-            attendance: attendance,
-            guestCount: String(count),
-            phone: phone,
-            message: message,
-            _t: String(Date.now())
-          });
-          const beacon = new Image();
-          beacon.src = `${targetUrl}?${queryParams.toString()}`;
         } catch(err) {
           console.log('Online sync attempt:', err);
         }

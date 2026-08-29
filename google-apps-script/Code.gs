@@ -263,49 +263,117 @@ function createJsonResponse(data) {
 // ----------------------------------------------------
 
 function handleSubmitRsvp(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let rsvpSheet = ss.getSheetByName('RSVP');
-
-  if (!rsvpSheet) {
-    setupSpreadsheet();
-    rsvpSheet = ss.getSheetByName('RSVP');
+  const lock = LockService.getScriptLock();
+  try {
+    // Wait up to 10 seconds for concurrent requests to serialize
+    lock.waitLock(10000);
+  } catch (e) {
+    // Continue if lock fails
   }
 
-  const rsvpId = 'RSVP-' + new Date().getTime();
-  const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Colombo' });
-  const attendance = (data.attendance || 'attending').toLowerCase().trim();
-  const guestCount = attendance === 'attending' ? (parseInt(data.guestCount, 10) || 1) : 0;
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let rsvpSheet = ss.getSheetByName('RSVP');
 
-  rsvpSheet.appendRow([
-    rsvpId,
-    data.inviteeName || 'Honoured Guest',
-    attendance,
-    guestCount,
-    data.guestNames || '',
-    String(data.phone || ''), // Always store as string to prevent Google Sheets auto-converting to number
-    data.message || '',
-    timestamp
-  ]);
-
-
-  // If a message/wish is included, also mirror to WISHES tab
-  if (data.message && String(data.message).trim().length > 0) {
-    let wishSheet = ss.getSheetByName('WISHES');
-    if (wishSheet) {
-      wishSheet.appendRow([
-        'WISH-' + new Date().getTime(),
-        data.inviteeName || 'Honoured Guest',
-        data.message,
-        timestamp
-      ]);
+    if (!rsvpSheet) {
+      setupSpreadsheet();
+      rsvpSheet = ss.getSheetByName('RSVP');
     }
-  }
 
-  return {
-    message: 'RSVP recorded successfully',
-    rsvpId: rsvpId,
-    attendance: attendance
-  };
+    const inviteeName = (data.inviteeName || 'Honoured Guest').trim();
+    const attendance = (data.attendance || 'attending').toLowerCase().trim();
+    const guestCount = attendance === 'attending' ? (parseInt(data.guestCount, 10) || 1) : 0;
+    const phone = String(data.phone || '').trim();
+    const message = (data.message || '').trim();
+    const guestNames = (data.guestNames || '').trim();
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-GB', { timeZone: 'Asia/Colombo' });
+
+    // Deduplication check: inspect the last 5 rows to catch rapid duplicate submissions
+    const lastRow = rsvpSheet.getLastRow();
+    if (lastRow > 1) {
+      const checkRowsCount = Math.min(5, lastRow - 1);
+      const startRow = lastRow - checkRowsCount + 1;
+      const recentRows = rsvpSheet.getRange(startRow, 1, checkRowsCount, 8).getValues();
+
+      for (let i = recentRows.length - 1; i >= 0; i--) {
+        const row = recentRows[i];
+        const rowId = row[0];
+        const rowName = String(row[1] || '').trim();
+        const rowAttendance = String(row[2] || '').toLowerCase().trim();
+        const rowCount = parseInt(row[3], 10) || 0;
+        const rowPhone = String(row[5] || '').trim();
+        const rowMessage = String(row[6] || '').trim();
+
+        // If identical name, attendance, guest count, phone, and message
+        if (
+          rowName.toLowerCase() === inviteeName.toLowerCase() &&
+          rowAttendance === attendance &&
+          rowCount === guestCount &&
+          rowPhone === phone &&
+          rowMessage === message
+        ) {
+          return {
+            message: 'RSVP already recorded (duplicate ignored)',
+            rsvpId: rowId,
+            attendance: attendance,
+            isDuplicate: true
+          };
+        }
+      }
+    }
+
+    const rsvpId = 'RSVP-' + now.getTime();
+
+    rsvpSheet.appendRow([
+      rsvpId,
+      inviteeName,
+      attendance,
+      guestCount,
+      guestNames,
+      phone,
+      message,
+      timestamp
+    ]);
+
+    // If a message/wish is included, also mirror to WISHES tab (with duplicate check)
+    if (message.length > 0) {
+      let wishSheet = ss.getSheetByName('WISHES');
+      if (wishSheet) {
+        let isWishDuplicate = false;
+        const wishLastRow = wishSheet.getLastRow();
+        if (wishLastRow > 1) {
+          const checkWishCount = Math.min(5, wishLastRow - 1);
+          const wishRows = wishSheet.getRange(wishLastRow - checkWishCount + 1, 1, checkWishCount, 4).getValues();
+          for (let w = 0; w < wishRows.length; w++) {
+            if (String(wishRows[w][1]).trim().toLowerCase() === inviteeName.toLowerCase() &&
+                String(wishRows[w][2]).trim() === message) {
+              isWishDuplicate = true;
+              break;
+            }
+          }
+        }
+        if (!isWishDuplicate) {
+          wishSheet.appendRow([
+            'WISH-' + now.getTime(),
+            inviteeName,
+            message,
+            timestamp
+          ]);
+        }
+      }
+    }
+
+    return {
+      message: 'RSVP recorded successfully',
+      rsvpId: rsvpId,
+      attendance: attendance
+    };
+  } finally {
+    try {
+      lock.releaseLock();
+    } catch(e) {}
+  }
 }
 
 function handleGetAdminData(pin) {
